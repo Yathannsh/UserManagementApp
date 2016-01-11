@@ -1,0 +1,190 @@
+<!DOCTYPE html>
+<html>
+	<head>
+	<title>UserManagementApp</title>
+	<script src="http://ajax.googleapis.com/ajax/libs/jquery/2.1.1/jquery.min.js">
+	</script>
+	<link rel="stylesheet" href="https://maxcdn.bootstrapcdn.com/bootstrap/3.3.1/css/bootstrap.min.css">
+	<script src="http://cdn.jsdelivr.net/vue/1.0.8/vue.js"></script>
+    <script src="vue-router.min.js"></script>
+		<link rel="stylesheet" href="select.min.css">
+		<link rel="stylesheet" href="styles.css">		
+	</head>
+	<body>
+	 <div class="github-fork-ribbon-wrapper right">
+        <div class="github-fork-ribbon">
+            <a href="https://github.com/Yathannsh/UserManagementApp">Fork me on GitHub</a>
+        </div>
+    </div>
+		 <div id="app">
+			<router-view></router-view>
+		 </div>
+
+		 <template id="register-template">
+			<div class="container">
+				<div class="row col-md-4 col-md-offset-4">
+					<div class="col-md-12">
+						<div v-show="errorMessage">	
+							<div class="alert alert-danger">
+								{{errorMessage}}
+							</div>
+						</div>
+						<br>
+					</div>
+					<div class="col-md-12">
+						<a href="#/user">
+							Back to user page
+						</a>
+					</div>
+					<div class="col-md-12">
+						<input class="form-control" v-model="login" placeholder="Login">
+						<br>
+					</div>
+
+					<div class="col-md-12">
+						<input class="form-control"  v-model="full" placeholder="Full name">
+						<br>
+					</div>
+					<div class="col-md-12">
+						<input class="form-control"  v-model="mail" placeholder="E-mail">
+						<br>
+					</div>
+					<div class="col-md-12">
+						<input class="form-control" type="password" v-model="password" placeholder="Password">
+						<br>
+					</div>
+					<div class="col-md-12">
+						<input class="form-control" type="password" v-model="passwordConfirm" placeholder="Password again">
+						 <br>
+					</div>
+					<div class="col-md-12">
+						<button class="btn btn-primary" v-on:click="registerUser">
+							Register
+						</button>
+					</div>
+				</div>
+			</div>
+		</template>
+		 <template id="user-template">
+		 			<header>
+			  <h1>FOSSASIA USER MANAGEMENT</h1>
+			  </header>
+			<div class="container">
+				<div class="col-md-12">
+					<div v-show="errorMessage">	
+						<div class="alert alert-danger">
+							{{errorMessage}}
+						</div>
+					</div>
+					<br>
+				</div>
+				<a href="#/register">
+					Go to registration page
+				</a>
+				<table class="table table-hover">
+					<tr>
+						<td>
+							<b>Login</b>
+						</td>
+						<td>
+							<b>Full name</b>
+						</td>
+						<td>
+							<b>E-mail address</b>
+						</td>
+						<td>
+							<b>Roles</b>
+						</td>
+						<td>&nbsp;</td>
+					</tr>
+					<tr v-for="user in users" track-by="$index" id="id-{{$index}}">
+						<td v-show="!user.editing">
+							{{user.login}}
+						 </td>
+						<td v-show="!user.editing">
+							{{user.full}}
+						</td>
+						<td v-show="!user.editing">
+							{{user.mail}}
+						</td>
+						<td v-show="!user.editing">
+							{{user.roles.join(', ')}}
+						</td>
+						<td v-show="!user.editing">
+							<button class="btn btn-success" v-on:click="editUser($index)">
+								Edit
+							</button>
+							<button class="btn btn-danger" v-on:click="deleteUser($index)">
+								Delete
+							</button>
+						</td>
+						<!--USER EDITING BELOW-->
+						<td v-show="user.editing">
+							<input placeholder="Login" class="form-control" v-model="users[$index].login">
+						</td>
+						<td v-show="user.editing">
+							<input placeholder="Full name" class="form-control" v-model="users[$index].full">
+						</td>
+						<td v-show="user.editing">
+							<input placeholder="Email" class="form-control" v-model="users[$index].mail">
+						</td>
+						<td v-show="user.editing">
+							<input type="checkbox" value="student" v-model="users[$index].roles"> Student<br />
+							<input type="checkbox" value="mentor" v-model="users[$index].roles"> Mentor <br />
+							<input type="checkbox" value="admin" v-model="users[$index].roles"> Admin
+						</td>
+						<td v-show="user.editing">
+							<button v-on:click="saveUser($index)" class="btn btn-success">
+								Save
+							</button>
+							<button type="button" v-on:click="cancelEditUser($index)" class="btn btn-danger">
+								Cancel
+							</button>
+						</td>
+						<td v-show="user.editing">
+						</td>
+						<td v-show="user.editing">
+						</td>
+					</tr>
+					<tr v-show="registring">
+						<td>
+							<input class="form-control" v-model="userCreation.login" placeholder="Login">
+						</td>
+						<td>
+							<input class="form-control"  v-model="userCreation.full" placeholder="Full name">
+						</td>
+						<td>      	    
+							<input class="form-control"  v-model="userCreation.mail" placeholder="E-mail">
+						</td>
+						<td>
+							<input type="checkbox" value="student" v-model="userCreation.roles"> Student<br />
+							<input type="checkbox" value="mentor" v-model="userCreation.roles"> Mentor <br />
+							<input type="checkbox" value="admin" v-model="userCreation.roles"> Admin
+						</td>
+						<td>
+							<input class="form-control col-md-12" type="password" v-model="userCreation.password" placeholder="Password">
+						</td>
+						<td>
+							<input class="form-control col-md-12" type="password" v-model="userCreation.passwordConfirm" placeholder="Password again">
+						</td>
+						<td style="width:141px;">
+							<button type="button" v-on:click="saveUser()" class="btn btn-primary">
+								Add
+							</button>
+							<button type="button" v-on:click="cancelAddUser" class="btn btn-danger">
+								Cancel
+							</button>
+						</td>
+					</tr>
+				</table>	
+				<div class="row">
+					<button v-show="!registring" v-on:click="addUser" class="btn btn-primary btn-lg">
+						Add user
+					</button>
+				</div>
+			</div>
+		</template>
+		<footer> <h4> MADE FOR  <a href= "http://fossasia.org" target="_blank">FOSSASIA</a>&nbsp;| Using <a href= "http://vuejs.org/" target="_blank">Vue.js</a></h4></footer>
+		 <script src="vue_app.js"></script>
+	</body>
+</html> 
