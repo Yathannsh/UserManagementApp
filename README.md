@@ -1,3 +1,3 @@
 # UserManagementApp
 A user management app written with vue.js  
-[DEMO] (https://github.com/Yathannsh/UserManagementApp.git)
+[DEMO] (http://gci.yathannsh.com/usermngtapp)
